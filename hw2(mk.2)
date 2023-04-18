@@ -1,3 +1,4 @@
+해당 코드에서 백트래킹을 하는 함수를 추가해줘
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
@@ -56,13 +57,13 @@ ty_element pop(listPointer* ptr)
 int path(int sy, int sx, int dy, int dx)
 {
     listPointer top = NULL;
-    int i, j, row, col, nextRow, nextCol, dir, basex, basey, occount;
+    int i, j, row, col, nextRow, nextCol, dir, basex, basey, occount, backtracks;
     int found, num_bktrack = 0, path_length = 0;
     int EXIT_ROW = dy, EXIT_COL = dx;
     ty_element position;
 
     if (maze[sy][sx] == 1 || maze[dy][dx] == 1) {
-        printf("입력오류: 출발점이나 목표점이 막힌 셀입니다.\n");
+        printf("\n입력오류: 출발점이나 목표점이 막힌 셀입니다.\n");
         return 0;
     }
 
@@ -74,10 +75,8 @@ int path(int sy, int sx, int dy, int dx)
     for (i = 0; i < m + 2; i++) {
         for (j = 0; j < p + 2; j++) {
             gotoxy(j + basex, i + basey);
-            if (maze[i][j] == 1)
-                printf("1");
-            else
-                printf("0");
+            printf("%1d", maze[i][j]);
+           
         }
     }
 
@@ -98,19 +97,20 @@ int path(int sy, int sx, int dy, int dx)
         col = position.col;
         dir = position.dir;
         while (dir < Max_dir) {
+            gotoxy(basex, basey + 15);
             nextRow = row + move[dir].vert;
             nextCol = col + move[dir].horiz;
             if (nextRow == EXIT_ROW && nextCol == EXIT_COL) {
-                printf("출력: 길 발견!\n");
-                printf("(%d,%d)에서 (%d,%d)까지의 경로: \n", sy, sx, dy, dx);
-                printf("(%d,%d)\n", row, col);
-                printf("(%d,%d)\n", nextRow, nextCol);
+               
+                printf("\n(%d,%d)에서 (%d,%d)까지의 경로: \n", sy, sx, dy, dx);
+                printf("\n(%d,%d)\n", row, col);
+                printf("\n(%d,%d)\n", nextRow, nextCol);
                 while (top) {
                     position = pop(&top);
-                    printf("(%d,%d)\n", position.row, position.col);
+                    printf("\n(%d,%d)\n", position.row, position.col);
                     path_length++;
                 }
-                printf("경로 길이: %d\n", path_length);
+                printf("\n경로 길이: %d\n", path_length);
                 return 1;
             }
             else if (!maze[nextRow][nextCol] && !mark[nextRow][nextCol]) {
@@ -126,7 +126,7 @@ int path(int sy, int sx, int dy, int dx)
             else ++dir;
         }
     }
-
+    gotoxy(basex, basey + 15);
     printf("출력: 출구를 찾을 수 없습니다.\n");
     return 0;
 
@@ -145,18 +145,13 @@ int main() {
 
     for (i = 0; i < m + 2; i++) {
         for (j = 0; j < p + 2; j++) {
-            ch = getc(fp);
-            while (ch == '\n' || ch == '\r') {
-                ch = getc(fp);
-            }
-            maze[i][j] = ch - '0';
-            mark[i][j] = 0;
+            fscanf(fp, "%d", &maze[i][j]);
         }
     }
     fclose(fp);
 
     printf("입력: 미로의 출발점과 도착점을 입력하세요.\n");
-    printf("입력: 출발점 (행,열) 도착점 (행,열):: ");
+    printf("입력: 출발점 (행,열) 도착점 (행,열): ");
     scanf("%d %d %d %d", &sy, &sx, &dy, &dx);
 
     if (!path(sy, sx, dy, dx)) {
